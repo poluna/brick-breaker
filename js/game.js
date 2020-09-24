@@ -2,7 +2,7 @@ const cvs = document.getElementById("breakout");
 const ctx = cvs.getContext("2d");
 
 const PADDLE_WIDTH = 120;
-const PADDLE_MARGIN_BOTTOM = 50;
+const PADDLE_MARGIN_BOTTOM = 35;
 const PADDLE_HEIGHT = 20;
 const BALL_RADIUS = 13;
 const SCORE_UNIT = 10;
@@ -69,7 +69,7 @@ const ball = {
 function drawBall() {
   ctx.beginPath();
   ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
-  ctx.fillStyle = "#2e3548";
+  ctx.fillStyle = "#4998bf";
   ctx.fill();
   ctx.closePath();
 }
@@ -128,7 +128,7 @@ const brick = {
   offSetLeft: 23,
   offSetTop: 20,
   marginTop: 30,
-  fillColor: "#2e3548",
+  fillColor: "#401e52",
 };
 
 let bricks = [];
@@ -164,7 +164,7 @@ function drawBricks() {
   }
 }
 
-function ballBrickCollsion() {
+function ballBrickCollision() {
   for (let r = 0; r < brick.row; r++) {
     for (let c = 0; c < brick.column; c++) {
       let b = bricks[r][c];
@@ -190,6 +190,32 @@ function showStats() {
   lifeStats.innerText = LIFE;
 }
 
+function updateStatus() {
+  let hitAllBricks = true;
+  for (let r = 0; r < brick.row; r++) {
+    for (let c = 0; c < brick.column; c++) {
+      hitAllBricks = hitAllBricks && !bricks[r][c].status;
+    }
+  }
+  if (hitAllBricks && LEVEL < 3) {
+    LEVEL++;
+    if (LEVEL == 3) {
+      alert("YOU WIN");
+      document.location.reload();
+    } else {
+      brick.row++;
+      ball.speed += 0.8;
+      resetBall();
+      createBricks();
+    }
+  }
+  if (LIFE == 0) {
+    alert("GAME OVER");
+    LIFE = 3;
+    document.location.reload();
+  }
+}
+
 //draw function
 function draw() {
   drawPaddle();
@@ -203,8 +229,9 @@ function update() {
   moveBall();
   ballWallCollision();
   ballPaddleCollision();
-  ballBrickCollsion();
+  ballBrickCollision();
   showStats();
+  updateStatus();
 }
 
 function loop() {
@@ -212,7 +239,8 @@ function loop() {
   draw();
   update();
 
-  //   requestAnimationFrame(loop);
+  requestAnimationFrame(loop);
 }
 
+// const interval = setInterval(loop, 5);
 loop();
